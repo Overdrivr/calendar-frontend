@@ -9,10 +9,10 @@
     <div class="cells d-flex justify-content-between mx-4">
       <div class="slots-column p-2" v-for="day in weekdays">
         <div
-          class="slot mt-2" v-for="slot in hourlySlots"
-          @clicked="createMeetingDraft(day, slot)">
+          class="slot mt-2 p-2" v-for="slot in hourlySlots"
+          v-on:click="createMeetingDraft(day, slot)">
           {{day}} {{slot}}
-          <div v-if="hasMeeting(day, slot)">
+          <div class="meeting-slot" v-if="hasMeeting(day, slot)">
             MEETING
           </div>
         </div>
@@ -42,10 +42,13 @@ export default {
       // TODO: Launch popup
     },
     hasMeeting(day, slot) {
-      
       for (let i = 0 ; i < this.meetings.length ; i++) {
-
+        let meeting = this.meetings[i]
+        if (meeting.day === day && meeting.slot === slot) {
+          return true
+        }
       }
+      return false
     }
   }
 }
@@ -59,5 +62,10 @@ export default {
   background-color: rgb(200, 200, 255, 0.3);
   width: 100%;
   min-height: 80px;
+}
+.meeting-slot {
+  background-color: blue;
+  width: 100%;
+  height: 100%
 }
 </style>
