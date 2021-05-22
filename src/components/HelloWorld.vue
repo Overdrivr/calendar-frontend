@@ -6,14 +6,16 @@
       @cancel="draftMeetingModalCancel"
       @ok="confirmDraftMeeting">
       <h2 class="my-4">Your Meeting</h2>
-        {{displayedMeetingDraftDate}}
+      <p>From {{displayedMeetingDraftDate}}</p>
+      <p>To {{meetingEnd(displayedMeetingDraftDate)}}</p>
     </b-modal>
 
     <b-modal
       ref="modal-display-meeting"
       title="Your meeting">
       <h2 class="my-4">Your Meeting</h2>
-      <p>{{displayedMeetingDraftDate}}</p>
+      <p>From {{displayedMeetingDraftDate}}</p>
+      <p>To {{meetingEnd(displayedMeetingDraftDate)}}</p>
       <p>Zoom call : <a target="_blank" :href="displayedMeetingDraft.url">{{displayedMeetingDraft.url}}</a></p>
     </b-modal>
 
@@ -134,6 +136,10 @@ export default {
       //let meetingEnd = Date(2021, 7, 5 + dayOffset, slot + 1, 0 ,0)
 
       return meetingStart
+    },
+    meetingEnd(date) {
+      date.setHours(date.getHours() + 1)
+      return date
     },
     startDrag(day, slot) {
       console.log('Starting drag', day, slot)
