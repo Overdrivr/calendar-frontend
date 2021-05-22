@@ -1,58 +1,63 @@
 <template>
   <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
+    <div class="headers d-flex justify-content-between  mx-4">
+      <div class="day-header" v-for="day in weekdays">
+        <h3>{{day}}</h3>
+      </div>
+    </div>
+
+    <div class="cells d-flex justify-content-between mx-4">
+      <div class="slots-column p-2" v-for="day in weekdays">
+        <div
+          class="slot mt-2" v-for="slot in hourlySlots"
+          @clicked="createMeetingDraft(day, slot)">
+          {{day}} {{slot}}
+          <div v-if="hasMeeting(day, slot)">
+            MEETING
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 export default {
   name: 'HelloWorld',
-  props: {
-    msg: String
+  data () {
+    return {
+      weekdays: ['Mon', 'Tues', 'Wed', 'Thurs', 'Friday', 'Sat', 'Sun'],
+      hourlySlots : [1, 2, 3],
+      meetings: []
+    }
+  },
+  methods: {
+    createMeetingDraft(day, slot) {
+      console.log(`Creating meeting draft for ${day} : ${slot}`)
+      this.meetings.push({
+        day,
+        slot,
+        status: 'draft'
+      })
+      // TODO: Launch popup
+    },
+    hasMeeting(day, slot) {
+      
+      for (let i = 0 ; i < this.meetings.length ; i++) {
+
+      }
+    }
   }
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
-  margin: 40px 0 0;
+.slots-column {
+  width: 100%;
 }
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
+.slot {
+  background-color: rgb(200, 200, 255, 0.3);
+  width: 100%;
+  min-height: 80px;
 }
 </style>
