@@ -1,5 +1,11 @@
 <template>
   <div class="hello">
+    <b-modal ref="modal-confirm-draft" title="Meeting">
+      <p class="my-4">Draft</p>
+      {{displayedMeetingDraft.day}}
+      {{displayedMeetingDraft.slot}}
+    </b-modal>
+
     <div class="headers d-flex justify-content-between  mx-4">
       <div class="day-header" v-for="day in weekdays">
         <h3>{{day}}</h3>
@@ -28,18 +34,24 @@ export default {
     return {
       weekdays: ['Mon', 'Tues', 'Wed', 'Thurs', 'Friday', 'Sat', 'Sun'],
       hourlySlots : [1, 2, 3],
-      meetings: []
+      meetings: [],
+      displayedMeetingDraft: {}
     }
   },
   methods: {
     createMeetingDraft(day, slot) {
       console.log(`Creating meeting draft for ${day} : ${slot}`)
-      this.meetings.push({
+
+      let newMeeting = {
         day,
         slot,
         status: 'draft'
-      })
-      // TODO: Launch popup
+      }
+
+      this.meetings.push(newMeeting)
+      this.displayedMeetingDraft = newMeeting
+
+      this.$refs['modal-confirm-draft'].show()
     },
     hasMeeting(day, slot) {
       for (let i = 0 ; i < this.meetings.length ; i++) {
