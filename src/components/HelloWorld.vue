@@ -32,6 +32,8 @@
 </template>
 
 <script>
+var axios = require('axios')
+
 export default {
   name: 'HelloWorld',
   data () {
@@ -49,7 +51,8 @@ export default {
       let newMeeting = {
         day,
         slot,
-        status: 'draft'
+        status: 'draft',
+        url: null
       }
 
       this.meetings.push(newMeeting)
@@ -71,12 +74,28 @@ export default {
       this.removeMeeting(this.displayedMeetingDraft)
     },
     confirmDraftMeeting() {
-      console.log('Confirming draft meeting')
-      
+      console.log(`Confirming draft meeting : ${this.displayedMeetingDraft}`)
+      console.log(`Meeting planned for : ${this.displayedMeetingDraftDate}`)
+
+      this.displayedMeetingDraft.status = 'confirmed'
+
+      axios
+        .post('localhost:8000/', {
+          'meetingDate': this.displayedMeetingDraftDate
+        })
+        .then(res => {
+          console.log('Confirmed meeting :', res)
+          this.displayedMeetingDraft.url = res.data.url
+          return res
+        })
+        .catch(err => {
+          console.warn('Request error: ', err)
+        })
     },
     removeMeeting(meetingToRemove) {
       this.meetings = this.meetings.filter(el => el !== meetingToRemove)
     },
+
     generateDailySlots() {
       let slots = []
 
