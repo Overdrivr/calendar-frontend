@@ -1,6 +1,10 @@
 <template>
   <div class="hello">
-    <b-modal ref="modal-confirm-draft" title="Meeting">
+    <b-modal
+      ref="modal-confirm-draft"
+      title="Meeting"
+      @cancel="draftMeetingModalCancel"
+      @ok="confirmDraftMeeting">
       <p class="my-4">Draft</p>
       {{displayedMeetingDraft.day}}
       {{displayedMeetingDraft.slot}}
@@ -61,6 +65,16 @@ export default {
         }
       }
       return false
+    },
+    draftMeetingModalCancel() {
+      console.log('Modal closed')
+      this.removeMeeting(this.displayedMeetingDraft)
+    },
+    confirmDraftMeeting() {
+      console.log('Confirming draft meeting')
+    },
+    removeMeeting(meetingToRemove) {
+      this.meetings = this.meetings.filter(el => el !== meetingToRemove)
     }
   }
 }
