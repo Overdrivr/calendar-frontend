@@ -2,12 +2,19 @@
   <div class="hello">
     <b-modal
       ref="modal-confirm-draft"
-      title="Meeting"
+      title="Create a meeting"
       @cancel="draftMeetingModalCancel"
       @ok="confirmDraftMeeting">
       <h2 class="my-4">Your Meeting</h2>
-
         {{displayedMeetingDraftDate}}
+    </b-modal>
+
+    <b-modal
+      ref="modal-display-meeting"
+      title="Your meeting">
+      <h2 class="my-4">Your Meeting</h2>
+      <p>{{displayedMeetingDraftDate}}</p>
+      <p>Zoom call : <a target="_blank" :href="displayedMeetingDraft.url">{{displayedMeetingDraft.url}}</a></p>
     </b-modal>
 
     <div class="headers d-flex justify-content-between  mx-4">
@@ -77,15 +84,23 @@ export default {
       console.log(`Confirming draft meeting : ${this.displayedMeetingDraft}`)
       console.log(`Meeting planned for : ${this.displayedMeetingDraftDate}`)
 
+      let startDate = this.daySlotToDate(
+        this.displayedMeetingDraft.day,
+        this.displayedMeetingDraft.slot
+      )
+
+      console.log(startDate)
+
       this.displayedMeetingDraft.status = 'confirmed'
 
       axios
-        .post('localhost:8000/', {
-          'meetingDate': this.displayedMeetingDraftDate
+        .post('http://localhost:5000', {
+          'startDate': startDate.toISOString()
         })
         .then(res => {
           console.log('Confirmed meeting :', res)
-          this.displayedMeetingDraft.url = res.data.url
+          this.displayedMeetingDraft.url = res.data.join_url
+          this.$refs['modal-display-meeting'].show()
           return res
         })
         .catch(err => {
@@ -109,7 +124,7 @@ export default {
       let dayOffset = this.weekdays.indexOf(day)
 
       // An arbitrary monday - July 5th
-      let meetingStart = Date(2021, 7, 5 + dayOffset, slot, 0, 0)
+      let meetingStart = new Date(2021, 7, 5 + dayOffset, slot, 0, 0)
       //let meetingEnd = Date(2021, 7, 5 + dayOffset, slot + 1, 0 ,0)
 
       return meetingStart
