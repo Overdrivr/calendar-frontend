@@ -26,10 +26,13 @@
     <div class="cells d-flex justify-content-between mx-4">
       <div class="slots-column p-2" v-for="day in weekdays">
         <div
-          class="slot mt-2 p-2" v-for="slot in hourlySlots"
+          class="slot mt-2 p-2 drop-area" v-for="slot in hourlySlots"
+          @dragover.prevent @dragenter.prevent
+          @drop="endDrag(day, slot)"
           v-on:click="createMeetingDraft(day, slot)">
           {{slot}}:00 > {{slot+1}}:00
-          <div class="meeting-slot" v-if="hasMeeting(day, slot)">
+          <div class="meeting-slot" v-if="hasMeeting(day, slot)" draggable
+            @drag="startDrag(day, slot)">
             MEETING
           </div>
         </div>
@@ -48,7 +51,8 @@ export default {
       weekdays: ['Mon', 'Tues', 'Wed', 'Thurs', 'Friday', 'Sat', 'Sun'],
       hourlySlots : this.generateDailySlots(),
       meetings: [],
-      displayedMeetingDraft: {}
+      displayedMeetingDraft: {},
+      draggedItem: {}
     }
   },
   methods: {
@@ -67,14 +71,17 @@ export default {
 
       this.$refs['modal-confirm-draft'].show()
     },
-    hasMeeting(day, slot) {
+    findMeeting(day, slot) {
       for (let i = 0 ; i < this.meetings.length ; i++) {
         let meeting = this.meetings[i]
         if (meeting.day === day && meeting.slot === slot) {
-          return true
+          return meeting
         }
       }
-      return false
+    },
+    hasMeeting(day, slot) {
+      let meeting = this.findMeeting(day, slot)
+      return !!(meeting)
     },
     draftMeetingModalCancel() {
       console.log('Modal closed')
@@ -110,7 +117,6 @@ export default {
     removeMeeting(meetingToRemove) {
       this.meetings = this.meetings.filter(el => el !== meetingToRemove)
     },
-
     generateDailySlots() {
       let slots = []
 
@@ -124,10 +130,25 @@ export default {
       let dayOffset = this.weekdays.indexOf(day)
 
       // An arbitrary monday - July 5th
-      let meetingStart = new Date(2021, 7, 5 + dayOffset, slot, 0, 0)
+      let meetingStart = new Date(2021, 6, 5 + dayOffset, slot, 0, 0)
       //let meetingEnd = Date(2021, 7, 5 + dayOffset, slot + 1, 0 ,0)
 
       return meetingStart
+    },
+    startDrag(day, slot) {
+      console.log('Starting drag', day, slot)
+      this.draggedItem = this.findMeeting(day, slot)
+    },
+    endDrag (day, slot) {
+      console.log('Ending drag ', this.draggedItem, 'to', day, slot)
+      this.draggedItem.day = day
+      this.draggedItem.slot = slot
+
+      // A bit of a hack to simplify code and force regen when meeting is dragged
+      this.displayedMeetingDraft = this.draggedItem
+      this.confirmDraftMeeting()
+
+      this.draggedItem = {}
     }
   },
   computed : {
