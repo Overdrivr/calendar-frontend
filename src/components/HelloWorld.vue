@@ -5,9 +5,9 @@
       title="Meeting"
       @cancel="draftMeetingModalCancel"
       @ok="confirmDraftMeeting">
-      <p class="my-4">Draft</p>
-      {{displayedMeetingDraft.day}}
-      {{displayedMeetingDraft.slot}}
+      <h2 class="my-4">Your Meeting</h2>
+
+        {{displayedMeetingDraftDate}}
     </b-modal>
 
     <div class="headers d-flex justify-content-between  mx-4">
@@ -21,7 +21,7 @@
         <div
           class="slot mt-2 p-2" v-for="slot in hourlySlots"
           v-on:click="createMeetingDraft(day, slot)">
-          {{day}} {{slot}}
+          {{slot}}:00 > {{slot+1}}:00
           <div class="meeting-slot" v-if="hasMeeting(day, slot)">
             MEETING
           </div>
@@ -37,7 +37,7 @@ export default {
   data () {
     return {
       weekdays: ['Mon', 'Tues', 'Wed', 'Thurs', 'Friday', 'Sat', 'Sun'],
-      hourlySlots : [1, 2, 3],
+      hourlySlots : this.generateDailySlots(),
       meetings: [],
       displayedMeetingDraft: {}
     }
@@ -72,9 +72,36 @@ export default {
     },
     confirmDraftMeeting() {
       console.log('Confirming draft meeting')
+      
     },
     removeMeeting(meetingToRemove) {
       this.meetings = this.meetings.filter(el => el !== meetingToRemove)
+    },
+    generateDailySlots() {
+      let slots = []
+
+      for (let i = 5 ; i < 22 ; i++) {
+        slots.push(i)
+      }
+
+      return slots
+    },
+    daySlotToDate(day, slot) {
+      let dayOffset = this.weekdays.indexOf(day)
+
+      // An arbitrary monday - July 5th
+      let meetingStart = Date(2021, 7, 5 + dayOffset, slot, 0, 0)
+      //let meetingEnd = Date(2021, 7, 5 + dayOffset, slot + 1, 0 ,0)
+
+      return meetingStart
+    }
+  },
+  computed : {
+    displayedMeetingDraftDate () {
+      return this.daySlotToDate(
+        this.displayedMeetingDraft.day,
+        this.displayedMeetingDraft.slot
+      )
     }
   }
 }
